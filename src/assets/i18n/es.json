@@ -1,0 +1,22 @@
+{
+    "ASISTANT_TAB_MAIN": {
+        "HEADER_TITLE": "Asistente IA",
+        "QUESTION_TITLE": "Preguntas sugeridas:",
+        "IA_QUICK_LINK_1": "¿Cómo puedo aumentar las ventas?",
+        "IA_QUICK_LINK_2": "¿En cuál mercado tendré más clientes?",
+        "IA_QUICK_LINK_3": "¿Cómo hacer productos más atractivos?",
+        "IA_QUICK_LINK_4": "¿Qué no se dice al vender?",
+        "IA_QUICK_LINK_5": "¿Cómo atender bien al cliente?",
+        "IA_QUICK_LINK_6": "¿Cómo retener a los clientes?",
+        "IA_QUICK_LINK_7": "",
+        "IA_QUICK_LINK_8": "",
+        "IA_QUICK_LINK_9": "",
+        "IA_QUICK_LINK_10": "",
+        "A_IA_CHAT_INPUT_PLACEHOLDER": "Escribir mensaje",
+        "LABEL_MSG_ADMINISTRATOR": "Administrador",
+        "LABEL_MSG_ASSISTANT": "Asistente",
+        "LISTENING": "Escuchando...",
+        "TALK_NOW": "Habla ahora",
+        "STOP_LISTENING": "Detener escucha"
+    }
+}

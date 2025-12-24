@@ -1,0 +1,22 @@
+{
+    "ASISTANT_TAB_MAIN": {
+        "HEADER_TITLE": "AI Assistant",
+        "QUESTION_TITLE": "Suggested questions",
+        "IA_QUICK_LINK_1": "How can I increase sales?",
+        "IA_QUICK_LINK_2": "Which market will I have more customers in?",
+        "IA_QUICK_LINK_3": "How to make products more attractive?",
+        "IA_QUICK_LINK_4": "What is not said when selling?",
+        "IA_QUICK_LINK_5": "How to provide good customer service?",
+        "IA_QUICK_LINK_6": "How to retain customers?",
+        "IA_QUICK_LINK_7": "",
+        "IA_QUICK_LINK_8": "",
+        "IA_QUICK_LINK_9": "",
+        "IA_QUICK_LINK_10": "",
+        "A_IA_CHAT_INPUT_PLACEHOLDER": "Write a message",
+        "LABEL_MSG_ADMINISTRATOR": "Administrator",
+        "LABEL_MSG_ASSISTANT": "Assistant",
+        "LISTENING": "Listening...",
+        "TALK_NOW": "Speak now",
+        "STOP_LISTENING": "Stop Listening"
+    }
+}

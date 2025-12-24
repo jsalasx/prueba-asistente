@@ -1,0 +1,15 @@
+<div 
+  [class]="'w-fit justify-self-center p-0 cursor-pointer transition-all duration-200 border ' + 
+           bgColor + ' ' + 
+           hoverBgColor + ' ' + 
+           shadow + ' ' + 
+           'hover:shadow-lg ' +
+           rounded + ' ' + 
+           padding + ' ' +
+           borderColor"
+  (click)="onClick()"
+>
+  <p [class]="'p-0 m-0 text-center ' + textSize + ' ' + textColor + ' ' + hoverTextColor">
+    {{ text }}
+  </p>
+</div>

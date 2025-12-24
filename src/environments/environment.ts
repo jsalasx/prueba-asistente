@@ -3,7 +3,11 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  apiUrlAgent: 'https://serviciosia.catalog-store.com',
+  apiKey: 'apiKeyCatalog_12345',
+  parseServerUrl: 'https://ecured.ecunegocio.com/parse/',
+  parseAppId: 'Ecu_Al@2019o_0708777z8A31qProt'
 };
 
 /*
