@@ -111,14 +111,7 @@ export class SpeechToTextService {
 
   // Iniciar reconocimiento
   async startListening(lang: string = 'es-ES') {
-    if (!this.recognition) {
-      this.errorSubject.next('Speech Recognition no disponible');
-      return;
-    }
 
-    if (this.isListening) {
-      return;
-    }
 
     try {
       // Solicitar permisos explícitamente
@@ -126,6 +119,15 @@ export class SpeechToTextService {
 
       // Detener el stream inmediatamente (solo necesitábamos el permiso)
       stream.getTracks().forEach(track => track.stop());
+
+      if (!this.recognition) {
+        this.errorSubject.next('Speech Recognition no disponible');
+        return;
+      }
+
+      if (this.isListening) {
+        return;
+      }
 
       // Ahora iniciar el reconocimiento
       this.recognition.lang = lang;
