@@ -94,12 +94,12 @@ export class Tab2Page implements OnInit {
     this.labelAdmin = this.translate.instant('ASISTANT_TAB_MAIN.LABEL_MSG_ADMINISTRATOR');
     this.labelAssistant = this.translate.instant('ASISTANT_TAB_MAIN.LABEL_MSG_ASSISTANT');
   }
-  toggleListening() {
+  async toggleListening() {
     if (this.isListening) {
       this.speechService.stopListening();
     } else {
       this.transcribedText = '';
-      this.speechService.startListening(this.translate.getCurrentLang()); // o 'en-US' para inglés
+      await this.speechService.startListening(this.translate.getCurrentLang()); // o 'en-US' para inglés
     }
   }
 

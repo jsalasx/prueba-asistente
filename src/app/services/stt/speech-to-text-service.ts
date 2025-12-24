@@ -110,7 +110,7 @@ export class SpeechToTextService {
   }
 
   // Iniciar reconocimiento
-  startListening(lang: string = 'es-ES') {
+  async startListening(lang: string = 'es-ES') {
     if (!this.recognition) {
       this.errorSubject.next('Speech Recognition no disponible');
       return;
@@ -120,10 +120,31 @@ export class SpeechToTextService {
       return;
     }
 
-    this.recognition.lang = lang;
-    this.recognition.start();
-    this.isListening = true;
-    this.statusSubject.next(true);
+    try {
+      // Solicitar permisos explícitamente
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+      // Detener el stream inmediatamente (solo necesitábamos el permiso)
+      stream.getTracks().forEach(track => track.stop());
+
+      // Ahora iniciar el reconocimiento
+      this.recognition.lang = lang;
+      this.recognition.start();
+      this.isListening = true;
+      this.statusSubject.next(true);
+
+    } catch (error: any) {
+      console.error('Error al solicitar permiso de micrófono:', error);
+      let errorMsg = 'No se pudo acceder al micrófono';
+
+      if (error.name === 'NotAllowedError') {
+        errorMsg = 'Permiso de micrófono denegado. Por favor, permite el acceso al micrófono en la configuración del navegador.';
+      } else if (error.name === 'NotFoundError') {
+        errorMsg = 'No se detectó ningún micrófono en tu dispositivo.';
+      }
+
+      this.errorSubject.next(errorMsg);
+    }
   }
 
   // Detener reconocimiento
