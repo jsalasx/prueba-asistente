@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 import { ViewItem } from '../components/chat/chat.component';
@@ -24,11 +24,17 @@ export class Tab2Page implements OnInit {
   transcribedText: string = '';
   isListening: boolean = false;
   isSpeechAvailable: boolean = false;
-  private subscription?: Subscription;
+  silenceRemainingMs = 0;
+  silenceProgress = 0; // 0..1
+  private ringRadius = 52;
 
+  private subscription?: Subscription;
   private textSubscription?: Subscription;
   private statusSubscription?: Subscription;
   private errorSubscription?: Subscription;
+  private finishedSpeakingSubscription?: Subscription;
+  private silenceSub?: Subscription;
+  private silenceProgSub?: Subscription;
 
   private userSubscription?: Subscription;
   private placeSubscription?: Subscription;
@@ -37,8 +43,18 @@ export class Tab2Page implements OnInit {
     private translate: TranslateService,
     private agentMcpService: AgentMcpService,
     private speechService: SpeechToTextService,
-    private userStateService: UserStateService
+    private userStateService: UserStateService,
+    private cdr: ChangeDetectorRef
   ) { }
+
+  get ringCircumference(): number {
+    return 2 * Math.PI * this.ringRadius;
+  }
+
+  get ringDashOffset(): number {
+    const progress = Math.min(1, Math.max(0, this.silenceProgress)); // 0..1
+    return this.ringCircumference * (1 - progress);
+  }
 
   async ngOnInit(): Promise<void> {
 
@@ -63,6 +79,8 @@ export class Tab2Page implements OnInit {
 
     this.isSpeechAvailable = this.speechService.isAvailable();
 
+    this.speechService.setSilenceDelay(3000);
+
     // Suscribirse al texto
     this.textSubscription = this.speechService.getText().subscribe(text => {
       this.transcribedText = text;
@@ -79,6 +97,31 @@ export class Tab2Page implements OnInit {
       console.error('Error de voz:', error);
       alert(`Error: ${error}`);
     });
+
+    this.finishedSpeakingSubscription = this.speechService.getFinishedSpeaking().subscribe(finalText => {
+      console.log('Usuario terminó de hablar:', finalText);
+
+      // Actualizar el input con el texto final
+      this.userInput = finalText;
+      this.transcribedText = finalText;
+      this.speechService.stopListening();
+      this.isListening = false;
+      this.cdr.detectChanges();
+      this.onSubmit();
+
+      // O mostrar una notificación visual
+      this.mostrarIndicadorTextoCompleto();
+    });
+
+    this.silenceSub = this.speechService.getSilenceRemainingMs().subscribe(ms => {
+      this.silenceRemainingMs = ms;
+      this.cdr.detectChanges();
+    });
+
+    this.silenceProgSub = this.speechService.getSilenceProgress().subscribe(p => {
+      this.silenceProgress = p;
+      this.cdr.detectChanges();
+    });
   }
 
   private cargarPreguntas() {
@@ -94,13 +137,24 @@ export class Tab2Page implements OnInit {
     this.labelAdmin = this.translate.instant('ASISTANT_TAB_MAIN.LABEL_MSG_ADMINISTRATOR');
     this.labelAssistant = this.translate.instant('ASISTANT_TAB_MAIN.LABEL_MSG_ASSISTANT');
   }
-  async toggleListening() {
+  toggleListening() {
     if (this.isListening) {
       this.speechService.stopListening();
     } else {
       this.transcribedText = '';
-      await this.speechService.startListening(this.translate.getCurrentLang()); // o 'en-US' para inglés
+      this.userInput = '';
+      this.speechService.startListening(this.translate.getCurrentLang()); // o 'en-US' para inglés
     }
+  }
+
+  // Método opcional para indicar visualmente que el texto está completo
+  private mostrarIndicadorTextoCompleto() {
+    // Puedes agregar una animación, cambio de color, o cualquier feedback visual
+    console.log('✓ Texto completo capturado');
+
+    // Ejemplo: agregar un efecto visual temporal
+    // this.textoCompleto = true;
+    // setTimeout(() => this.textoCompleto = false, 1000);
   }
 
   ngOnDestroy() {
@@ -111,6 +165,9 @@ export class Tab2Page implements OnInit {
     this.textSubscription?.unsubscribe();
     this.statusSubscription?.unsubscribe();
     this.errorSubscription?.unsubscribe();
+    this.finishedSpeakingSubscription?.unsubscribe();
+    this.silenceSub?.unsubscribe();
+    this.silenceProgSub?.unsubscribe();
   }
 
 
@@ -136,6 +193,10 @@ export class Tab2Page implements OnInit {
 
     if (this.userInput.trim()) {
       console.log('Mensaje:', this.userInput);
+
+      if (this.isListening) {
+        this.speechService.stopListening();
+      }
       this.enviarMensaje(this.userInput);
       const textoInput = this.userInput;
       this.messages = [...this.messages, { type: 'user', key: this.userId, message: textoInput, time: new Date().toISOString(), title: this.labelAdmin },
@@ -159,6 +220,7 @@ export class Tab2Page implements OnInit {
         const msgFiltered = this.messages.filter(msg => !(msg.type === 'assistant' && msg.isLoading));
         this.messages = [...msgFiltered, { type: 'assistant', key: this.userId + '_resp_' + Date.now(), message: response.answer, time: new Date().toISOString(), title: this.labelAssistant, isLoading: false }];
         this.isLoading = false;
+        this.cdr.detectChanges();
       },
       error: (error) => {
         console.error('Error al comunicarse con la IA:', error);

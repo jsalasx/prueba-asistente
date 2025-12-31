@@ -46,35 +46,78 @@
     </div>
   </div>
 
-  <div class="p-2">
-    <!-- Indicador de que está escuchando -->
-    <div *ngIf="isListening" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div class="bg-white rounded-3xl p-8 text-center shadow-2xl">
-        <div class="relative w-32 h-32 mx-auto mb-4">
-          <!-- Animación de ondas -->
-          <div class="absolute inset-0 bg-[#660066] rounded-full animate-ping opacity-75"></div>
-          <div class="absolute inset-0 bg-[#660066] rounded-full flex items-center justify-center">
-            <ion-icon name="mic" class="text-white text-6xl"></ion-icon>
-          </div>
+  <!-- MODAL: escuchando (ANILLO) -->
+  <div *ngIf="isListening" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-3xl p-8 text-center shadow-2xl w-[320px]">
+
+      <!-- Anillo + mic -->
+      <div class="relative w-32 h-32 mx-auto mb-6">
+        <!-- ping suave -->
+        <div class="absolute inset-0 bg-[#660066] rounded-full animate-ping opacity-20"></div>
+
+        <!-- Anillo -->
+        <svg class="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 120 120">
+          <!-- Fondo -->
+          <circle
+            cx="60" cy="60" r="52"
+            fill="none"
+            stroke="rgba(0,0,0,0.10)"
+            stroke-width="10"
+          ></circle>
+
+          <!-- Progreso -->
+          <circle
+            cx="60" cy="60" r="52"
+            fill="none"
+            stroke="#660066"
+            stroke-width="10"
+            stroke-linecap="round"
+            [attr.stroke-dasharray]="ringCircumference"
+            [attr.stroke-dashoffset]="ringDashOffset"
+            style="transition: stroke-dashoffset 100ms linear;"
+          ></circle>
+        </svg>
+
+        <!-- Centro -->
+        <div class="absolute inset-3 bg-[#660066] rounded-full flex items-center justify-center shadow-xl">
+          <ion-icon name="mic" class="text-white text-6xl"></ion-icon>
         </div>
 
-        <h3 class="text-xl font-bold mb-2">{{ 'ASISTANT_TAB_MAIN.LISTENING' | translate }}</h3>
-        <p class="text-gray-600 mb-4">{{ 'ASISTANT_TAB_MAIN.TALK_NOW' | translate }}</p>
-
-        <button (click)="toggleListening()"
-          class="w-full h-12 bg-[#660066] text-white rounded-full px-6 py-3 transition-colors hover:bg-[#7a007a]"
-          style="border-radius: 10px;"
-          >
-          
-          {{ 'ASISTANT_TAB_MAIN.STOP_LISTENING' | translate }}
-        </button>
+        <!-- Segundos -->
+        <div class="absolute -bottom-7 left-0 right-0 text-center">
+          <span class="text-sm font-semibold text-gray-700">
+            {{ (silenceRemainingMs / 1000) | number:'1.0-1' }}s
+          </span>
+        </div>
       </div>
-    </div>
 
-    <!-- Mensaje si no está disponible -->
-    <div *ngIf="!isSpeechAvailable"
-      class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded-lg mb-4">
+      <h3 class="text-xl font-bold mb-2">
+        {{ 'ASISTANT_TAB_MAIN.LISTENING' | translate }}
+      </h3>
+
+      <p class="text-gray-600 mb-2">
+        {{ 'ASISTANT_TAB_MAIN.TALK_NOW' | translate }}
+      </p>
+
+      <p class="text-xs text-gray-500 mb-4">
+        Si vuelves a hablar, el contador se reinicia.
+      </p>
+
+      <button
+        (click)="toggleListening()"
+        class="w-full h-12 bg-[#660066] text-white rounded-full px-6 py-3 transition-colors hover:bg-[#7a007a]"
+        style="border-radius: 10px;"
+      >
+        {{ 'ASISTANT_TAB_MAIN.STOP_LISTENING' | translate }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Aviso si no hay STT -->
+  <div *ngIf="!isSpeechAvailable" class="p-2">
+    <div class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded-lg mb-4">
       <p>⚠️ Reconocimiento de voz no disponible en este navegador</p>
     </div>
   </div>
+
 </ion-content>
