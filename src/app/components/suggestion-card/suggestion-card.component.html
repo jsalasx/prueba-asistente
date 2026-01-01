@@ -6,10 +6,11 @@
            'hover:shadow-lg ' +
            rounded + ' ' + 
            padding + ' ' +
+           bgDarkColor + ' ' +
            borderColor"
   (click)="onClick()"
 >
-  <p [class]="'p-0 m-0 text-center ' + textSize + ' ' + textColor + ' ' + hoverTextColor">
+  <p [class]="'p-0 m-0 text-center ' + textSize + ' ' + textColor + ' ' + hoverTextColor + ' ' + darkTextColor">
     {{ text }}
   </p>
 </div>

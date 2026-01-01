@@ -17,6 +17,8 @@ export class SuggestionCardComponent  implements OnInit {
   @Input() shadow: string = 'shadow-md';
   @Input() rounded: string = 'rounded-2xl'; // rounded-lg, rounded-xl, rounded-2xl, rounded-3xl
   @Input() padding: string = 'p-2';
+  @Input() bgDarkColor: string = 'dark:bg-gray-800';
+  @Input() darkTextColor: string = 'dark:text-gray-200';
 
   @Output() cardClick = new EventEmitter<string>();
   constructor() { }

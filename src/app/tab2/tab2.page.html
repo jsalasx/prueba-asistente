@@ -7,7 +7,7 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <div class="min-h-full bg-gray-100 flex flex-col ">
+  <div class="min-h-full bg-gray-100 dark:bg-gray-950 dark:text-white flex flex-col ">
     <div *ngIf="messages.length == 0" class="text-center text-base p-4">
       <h2 class="text-gray-400 text-[19px]">{{'ASISTANT_TAB_MAIN.QUESTION_TITLE' | translate }}</h2>
       <div class="grid grid-cols-1 justify-center items-center w-full gap-1">
@@ -19,27 +19,31 @@
     <div>
       <app-chat [messages]="messages"></app-chat>
     </div>
-    <div class="fixed bottom-0 left-0 right-0 bg-white">
+    <div class="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 p-4 dark:border-t dark:border-gray-700">
       <form (ngSubmit)="onSubmit()" class="flex items-center gap-2">
         <input type="text" placeholder="{{ 'ASISTANT_TAB_MAIN.A_IA_CHAT_INPUT_PLACEHOLDER' | translate }}" class="
     flex-1
     px-4 py-3 text-base
     border-b-2 border-white
+    dark:border-gray-700
     focus:outline-none
     focus:border-[#660066]
     transition-all duration-500 ease-in-out
+    dark:bg-gray-950
+    dark:text-white
   " [(ngModel)]="userInput" name="userInput" [disabled]="isLoading" />
 
         <!-- Botón de enviar -->
         <button type="submit" [disabled]="isLoading"
-          class="transition-all duration-200 flex items-center justify-center">
+          class=" transition-all duration-200 flex items-center justify-center  dark:text-white
+    disabled:bg-gray-300 dark:disabled:bg-gray-700 dark:border-white disabled:cursor-not-allowed">
           <!-- Icono de enviar (triángulo/flecha) -->
           <ion-icon name="send-sharp" size="large" class="text-[#660066]"></ion-icon>
         </button>
         <button type="button" (click)="toggleListening()" [disabled]="!isSpeechAvailable" [class]="isListening 
           ? 'bg-red-600 hover:bg-red-700 text-white rounded-lg' 
           : 'bg-white-600 text-[#660066]'"
-          class="disabled:bg-gray-300  w-12 h-12 rounded-full flex items-center justify-center transition-colors">
+          class="disabled:bg-gray-300 dark:disabled:bg-gray-700  w-12 h-12 rounded-full flex items-center justify-center transition-colors">
           <ion-icon [name]="isListening ? 'stop-circle' : 'mic'" size="large"></ion-icon>
         </button>
       </form>
