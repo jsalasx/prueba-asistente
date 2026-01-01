@@ -12,7 +12,7 @@
       <h2 class="text-gray-400 text-[19px]">{{'ASISTANT_TAB_MAIN.QUESTION_TITLE' | translate }}</h2>
       <div class="grid grid-cols-1 justify-center items-center w-full gap-1">
         <app-suggestion-card *ngFor="let pregunta of preguntasParaIaPorDefecto" [text]="pregunta"
-          hoverBgColor="hover:bg-[#e5dbff]" hoverTextColor="hover:text-[#660066]" textSize="text-[15px]"
+          hoverBgColor="hover:bg-[#e5dbff]" hoverTextColor="hover:text-tw-primary" textSize="text-[15px]"
           (cardClick)="onSuggestionClick($event)"></app-suggestion-card>
       </div>
     </div>
@@ -27,7 +27,7 @@
     border-b-2 border-white
     dark:border-gray-700
     focus:outline-none
-    focus:border-[#660066]
+    focus:border-tw-primary
     transition-all duration-500 ease-in-out
     dark:bg-gray-950
     dark:text-white
@@ -35,16 +35,16 @@
 
         <!-- Botón de enviar -->
         <button type="submit" [disabled]="isLoading"
-          class=" transition-all duration-200 flex items-center justify-center  dark:text-white
-    disabled:bg-gray-300 dark:disabled:bg-gray-700 dark:border-white disabled:cursor-not-allowed">
+          class="w-12 h-12 transition-all duration-200 flex items-center justify-center  dark:text-white
+     dark:border-white disabled:cursor-not-allowed rounded-2xl">
           <!-- Icono de enviar (triángulo/flecha) -->
-          <ion-icon name="send-sharp" size="large" class="text-[#660066]"></ion-icon>
+          <ion-icon [name]="isLoading ? 'stop-circle' : 'send-sharp'" size="large" [class]="isLoading ? 'text-red-500': 'text-tw-primary'"></ion-icon>
         </button>
-        <button type="button" (click)="toggleListening()" [disabled]="!isSpeechAvailable" [class]="isListening 
+        <button type="button" (click)="toggleListening()" [disabled]="!isSpeechAvailable || isLoading" [class]="isListening 
           ? 'bg-red-600 hover:bg-red-700 text-white rounded-lg' 
-          : 'bg-white-600 text-[#660066]'"
-          class="disabled:bg-gray-300 dark:disabled:bg-gray-700  w-12 h-12 rounded-full flex items-center justify-center transition-colors">
-          <ion-icon [name]="isListening ? 'stop-circle' : 'mic'" size="large"></ion-icon>
+          : 'bg-white-600 text-tw-primary'"
+          class=" w-12 h-12 rounded-full flex items-center justify-center transition-colors">
+          <ion-icon [name]="isListening ? 'stop-circle' : 'mic'" size="large" [class]="!isSpeechAvailable || isLoading ? 'text-red-500': 'text-tw-primary'" ></ion-icon>
         </button>
       </form>
     </div>
@@ -57,7 +57,7 @@
       <!-- Anillo + mic -->
       <div class="relative w-32 h-32 mx-auto mb-6">
         <!-- ping suave -->
-        <div class="absolute inset-0 bg-[#660066] rounded-full animate-ping opacity-20"></div>
+        <div class="absolute inset-0 bg-tw-primary rounded-full animate-ping opacity-20"></div>
 
         <!-- Anillo -->
         <svg class="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 120 120">
@@ -83,7 +83,7 @@
         </svg>
 
         <!-- Centro -->
-        <div class="absolute inset-3 bg-[#660066] rounded-full flex items-center justify-center shadow-xl">
+        <div class="absolute inset-3 bg-tw-primary rounded-full flex items-center justify-center shadow-xl">
           <ion-icon name="mic" class="text-white text-6xl"></ion-icon>
         </div>
 
@@ -109,7 +109,7 @@
 
       <button
         (click)="toggleListening()"
-        class="w-full h-12 bg-[#660066] text-white rounded-full px-6 py-3 transition-colors hover:bg-[#7a007a]"
+        class="w-full h-12 bg-tw-primary text-white rounded-full px-6 py-3 transition-colors hover:bg-[#7a007a]"
         style="border-radius: 10px;"
       >
         {{ 'ASISTANT_TAB_MAIN.STOP_LISTENING' | translate }}
