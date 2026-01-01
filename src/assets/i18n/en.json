@@ -17,6 +17,7 @@
         "LABEL_MSG_ASSISTANT": "Assistant",
         "LISTENING": "Listening...",
         "TALK_NOW": "Speak now",
-        "STOP_LISTENING": "Stop Listening"
+        "STOP_LISTENING": "Stop Listening",
+        "WAITING_FOR_RESPONSE": "Waiting for response..."
     }
 }

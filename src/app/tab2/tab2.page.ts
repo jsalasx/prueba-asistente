@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, NgZone, OnInit } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 import { ViewItem } from '../components/chat/chat.component';
@@ -21,6 +21,7 @@ export class Tab2Page implements OnInit {
   preguntasParaIaPorDefecto: string[] = [];
   labelAdmin: string = '';
   labelAssistant: string = '';
+  labelWaitingResponse: string = '';
   transcribedText: string = '';
   isListening: boolean = false;
   isSpeechAvailable: boolean = false;
@@ -45,7 +46,8 @@ export class Tab2Page implements OnInit {
     private agentMcpService: AgentMcpService,
     private speechService: SpeechToTextService,
     private userStateService: UserStateService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private zone: NgZone
   ) {}
 
   get ringCircumference(): number {
@@ -110,18 +112,18 @@ export class Tab2Page implements OnInit {
     this.finishedSpeakingSubscription = this.speechService
       .getFinishedSpeaking()
       .subscribe((finalText) => {
-        console.log('Usuario terminó de hablar:', finalText);
+        this.zone.run(() => {
+          console.log('Usuario terminó de hablar:', finalText);
 
-        // Actualizar el input con el texto final
-        this.userInput = finalText;
-        this.transcribedText = finalText;
-        this.speechService.stopListening();
-        this.isListening = false;
-        this.cdr.detectChanges();
-        this.onSubmit();
+          this.transcribedText = finalText;
 
-        // O mostrar una notificación visual
-        this.mostrarIndicadorTextoCompleto();
+          this.isListening = false;
+
+          // O mostrar una notificación visual
+          this.mostrarIndicadorTextoCompleto();
+
+          setTimeout(() => this.submitText(finalText), 0);
+        });
       });
 
     this.silenceSub = this.speechService
@@ -151,6 +153,7 @@ export class Tab2Page implements OnInit {
         'ASISTANT_TAB_MAIN.IA_QUICK_LINK_6',
         'ASISTANT_TAB_MAIN.LABEL_MSG_ADMINISTRATOR',
         'ASISTANT_TAB_MAIN.LABEL_MSG_ASSISTANT',
+        'WAITING_FOR_RESPONSE',
       ])
       .subscribe((t) => {
         this.preguntasParaIaPorDefecto = [
@@ -164,10 +167,10 @@ export class Tab2Page implements OnInit {
 
         this.labelAdmin = t['ASISTANT_TAB_MAIN.LABEL_MSG_ADMINISTRATOR'];
         this.labelAssistant = t['ASISTANT_TAB_MAIN.LABEL_MSG_ASSISTANT'];
-        
+        this.labelWaitingResponse = t['WAITING_FOR_RESPONSE'];
+
         this.isFetchingTranslatedText = false;
         this.cdr.detectChanges();
-
       });
   }
   toggleListening() {
@@ -246,7 +249,7 @@ export class Tab2Page implements OnInit {
         {
           type: 'assistant',
           key: this.userId + '_resp',
-          message: 'Esperando respuesta',
+          message: this.labelWaitingResponse,
           time: new Date().toISOString(),
           title: this.labelAssistant,
           isLoading: true,
@@ -292,5 +295,41 @@ export class Tab2Page implements OnInit {
           this.isLoading = false;
         },
       });
+  }
+
+  submitText(text: string) {
+    const message = (text || '').trim();
+    if (!message) return;
+
+    this.isLoading = true;
+
+    if (!this.userId?.trim()) {
+      this.isLoading = false;
+      return;
+    }
+
+    this.enviarMensaje(message);
+
+    this.messages = [
+      ...this.messages,
+      {
+        type: 'user',
+        key: this.userId,
+        message,
+        time: new Date().toISOString(),
+        title: this.labelAdmin,
+      },
+      {
+        type: 'assistant',
+        key: this.userId + '_resp',
+        message: this.labelWaitingResponse,
+        time: new Date().toISOString(),
+        title: this.labelAssistant,
+        isLoading: true,
+      },
+    ];
+
+    this.userInput = '';
+    this.isListening = false;
   }
 }
