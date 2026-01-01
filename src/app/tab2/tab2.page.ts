@@ -16,8 +16,8 @@ export class Tab2Page implements OnInit {
   userInput: string = '';
   isLoading: boolean = false;
 
-  userId: string = ""
-  languagePlace: string = ""
+  userId: string = '';
+  languagePlace: string = '';
   preguntasParaIaPorDefecto: string[] = [];
   labelAdmin: string = '';
   labelAssistant: string = '';
@@ -26,6 +26,7 @@ export class Tab2Page implements OnInit {
   isSpeechAvailable: boolean = false;
   silenceRemainingMs = 0;
   silenceProgress = 0; // 0..1
+  isFetchingTranslatedText: boolean = false;
   private ringRadius = 52;
 
   private subscription?: Subscription;
@@ -45,7 +46,7 @@ export class Tab2Page implements OnInit {
     private speechService: SpeechToTextService,
     private userStateService: UserStateService,
     private cdr: ChangeDetectorRef
-  ) { }
+  ) {}
 
   get ringCircumference(): number {
     return 2 * Math.PI * this.ringRadius;
@@ -57,21 +58,25 @@ export class Tab2Page implements OnInit {
   }
 
   async ngOnInit(): Promise<void> {
-
-    this.userId = this.userStateService.getUserId() || "";
+    this.userId = this.userStateService.getUserId() || '';
     this.languagePlace = this.userStateService.getPlaceData()?.lenguaje || 'es';
-
-    this.userSubscription = this.userStateService.userData$.subscribe(userData => {
-      if (userData) {
-        this.userId = userData.userId;
+    this.translate.use(this.languagePlace || 'es');
+    this.cargarPreguntas();
+    this.userSubscription = this.userStateService.userData$.subscribe(
+      (userData) => {
+        if (userData) {
+          this.userId = userData.userId;
+        }
       }
-    });
+    );
 
-    this.placeSubscription = this.userStateService.placeData$.subscribe(placeData => {
-      if (placeData) {
-        this.languagePlace = placeData.lenguaje || 'es';
+    this.placeSubscription = this.userStateService.placeData$.subscribe(
+      (placeData) => {
+        if (placeData) {
+          this.languagePlace = placeData.lenguaje || 'es';
+        }
       }
-    });
+    );
 
     this.subscription = this.translate.onLangChange.subscribe(() => {
       this.cargarPreguntas();
@@ -82,60 +87,88 @@ export class Tab2Page implements OnInit {
     this.speechService.setSilenceDelay(3000);
 
     // Suscribirse al texto
-    this.textSubscription = this.speechService.getText().subscribe(text => {
+    this.textSubscription = this.speechService.getText().subscribe((text) => {
       this.transcribedText = text;
       this.userInput = text; // Actualizar el input
     });
 
     // Suscribirse al estado
-    this.statusSubscription = this.speechService.getStatus().subscribe(status => {
-      this.isListening = status;
-    });
+    this.statusSubscription = this.speechService
+      .getStatus()
+      .subscribe((status) => {
+        this.isListening = status;
+      });
 
     // Suscribirse a errores
-    this.errorSubscription = this.speechService.getErrors().subscribe(error => {
-      console.error('Error de voz:', error);
-      alert(`Error: ${error}`);
-    });
+    this.errorSubscription = this.speechService
+      .getErrors()
+      .subscribe((error) => {
+        console.error('Error de voz:', error);
+        alert(`Error: ${error}`);
+      });
 
-    this.finishedSpeakingSubscription = this.speechService.getFinishedSpeaking().subscribe(finalText => {
-      console.log('Usuario terminó de hablar:', finalText);
+    this.finishedSpeakingSubscription = this.speechService
+      .getFinishedSpeaking()
+      .subscribe((finalText) => {
+        console.log('Usuario terminó de hablar:', finalText);
 
-      // Actualizar el input con el texto final
-      this.userInput = finalText;
-      this.transcribedText = finalText;
-      this.speechService.stopListening();
-      this.isListening = false;
-      this.cdr.detectChanges();
-      this.onSubmit();
+        // Actualizar el input con el texto final
+        this.userInput = finalText;
+        this.transcribedText = finalText;
+        this.speechService.stopListening();
+        this.isListening = false;
+        this.cdr.detectChanges();
+        this.onSubmit();
 
-      // O mostrar una notificación visual
-      this.mostrarIndicadorTextoCompleto();
-    });
+        // O mostrar una notificación visual
+        this.mostrarIndicadorTextoCompleto();
+      });
 
-    this.silenceSub = this.speechService.getSilenceRemainingMs().subscribe(ms => {
-      this.silenceRemainingMs = ms;
-      this.cdr.detectChanges();
-    });
+    this.silenceSub = this.speechService
+      .getSilenceRemainingMs()
+      .subscribe((ms) => {
+        this.silenceRemainingMs = ms;
+        this.cdr.detectChanges();
+      });
 
-    this.silenceProgSub = this.speechService.getSilenceProgress().subscribe(p => {
-      this.silenceProgress = p;
-      this.cdr.detectChanges();
-    });
+    this.silenceProgSub = this.speechService
+      .getSilenceProgress()
+      .subscribe((p) => {
+        this.silenceProgress = p;
+        this.cdr.detectChanges();
+      });
   }
 
   private cargarPreguntas() {
-    this.preguntasParaIaPorDefecto = [
-      this.translate.instant('ASISTANT_TAB_MAIN.IA_QUICK_LINK_1'),
-      this.translate.instant('ASISTANT_TAB_MAIN.IA_QUICK_LINK_2'),
-      this.translate.instant('ASISTANT_TAB_MAIN.IA_QUICK_LINK_3'),
-      this.translate.instant('ASISTANT_TAB_MAIN.IA_QUICK_LINK_4'),
-      this.translate.instant('ASISTANT_TAB_MAIN.IA_QUICK_LINK_5'),
-      this.translate.instant('ASISTANT_TAB_MAIN.IA_QUICK_LINK_6'),
-    ];
+    this.isFetchingTranslatedText = true;
+    this.translate
+      .get([
+        'ASISTANT_TAB_MAIN.IA_QUICK_LINK_1',
+        'ASISTANT_TAB_MAIN.IA_QUICK_LINK_2',
+        'ASISTANT_TAB_MAIN.IA_QUICK_LINK_3',
+        'ASISTANT_TAB_MAIN.IA_QUICK_LINK_4',
+        'ASISTANT_TAB_MAIN.IA_QUICK_LINK_5',
+        'ASISTANT_TAB_MAIN.IA_QUICK_LINK_6',
+        'ASISTANT_TAB_MAIN.LABEL_MSG_ADMINISTRATOR',
+        'ASISTANT_TAB_MAIN.LABEL_MSG_ASSISTANT',
+      ])
+      .subscribe((t) => {
+        this.preguntasParaIaPorDefecto = [
+          t['ASISTANT_TAB_MAIN.IA_QUICK_LINK_1'],
+          t['ASISTANT_TAB_MAIN.IA_QUICK_LINK_2'],
+          t['ASISTANT_TAB_MAIN.IA_QUICK_LINK_3'],
+          t['ASISTANT_TAB_MAIN.IA_QUICK_LINK_4'],
+          t['ASISTANT_TAB_MAIN.IA_QUICK_LINK_5'],
+          t['ASISTANT_TAB_MAIN.IA_QUICK_LINK_6'],
+        ];
 
-    this.labelAdmin = this.translate.instant('ASISTANT_TAB_MAIN.LABEL_MSG_ADMINISTRATOR');
-    this.labelAssistant = this.translate.instant('ASISTANT_TAB_MAIN.LABEL_MSG_ASSISTANT');
+        this.labelAdmin = t['ASISTANT_TAB_MAIN.LABEL_MSG_ADMINISTRATOR'];
+        this.labelAssistant = t['ASISTANT_TAB_MAIN.LABEL_MSG_ASSISTANT'];
+        
+        this.isFetchingTranslatedText = false;
+        this.cdr.detectChanges();
+
+      });
   }
   toggleListening() {
     if (this.isListening) {
@@ -170,8 +203,6 @@ export class Tab2Page implements OnInit {
     this.silenceProgSub?.unsubscribe();
   }
 
-
-
   messages: ViewItem[] = [];
 
   onSuggestionClick(pregunta: string) {
@@ -184,7 +215,11 @@ export class Tab2Page implements OnInit {
   onSubmit() {
     this.isLoading = true;
 
-    if (this.userId === undefined || this.userId === null || this.userId.trim() === "") {
+    if (
+      this.userId === undefined ||
+      this.userId === null ||
+      this.userId.trim() === ''
+    ) {
       console.error('User ID no está definido.');
       alert('Error: User ID no está definido.');
       this.isLoading = false;
@@ -199,8 +234,24 @@ export class Tab2Page implements OnInit {
       }
       this.enviarMensaje(this.userInput);
       const textoInput = this.userInput;
-      this.messages = [...this.messages, { type: 'user', key: this.userId, message: textoInput, time: new Date().toISOString(), title: this.labelAdmin },
-      { type: 'assistant', key: this.userId + '_resp', message: 'Esperando respuesta', time: new Date().toISOString(), title: this.labelAssistant, isLoading: true }];
+      this.messages = [
+        ...this.messages,
+        {
+          type: 'user',
+          key: this.userId,
+          message: textoInput,
+          time: new Date().toISOString(),
+          title: this.labelAdmin,
+        },
+        {
+          type: 'assistant',
+          key: this.userId + '_resp',
+          message: 'Esperando respuesta',
+          time: new Date().toISOString(),
+          title: this.labelAssistant,
+          isLoading: true,
+        },
+      ];
       this.userInput = ''; // Limpiar
       this.isListening = false;
     } else {
@@ -210,23 +261,36 @@ export class Tab2Page implements OnInit {
   enviarMensaje(mensaje: string) {
     // Tu lógica
     console.log('Enviando mensaje:', mensaje);
-    this.agentMcpService.ask({
-      question: mensaje,
-      userId: this.userId,
-      language: this.languagePlace,
-    }).subscribe({
-      next: (response) => {
-        console.log('Respuesta de la IA:', response.answer);
-        const msgFiltered = this.messages.filter(msg => !(msg.type === 'assistant' && msg.isLoading));
-        this.messages = [...msgFiltered, { type: 'assistant', key: this.userId + '_resp_' + Date.now(), message: response.answer, time: new Date().toISOString(), title: this.labelAssistant, isLoading: false }];
-        this.isLoading = false;
-        this.cdr.detectChanges();
-      },
-      error: (error) => {
-        console.error('Error al comunicarse con la IA:', error);
-        this.isLoading = false;
-      }
-    });
+    this.agentMcpService
+      .ask({
+        question: mensaje,
+        userId: this.userId,
+        language: this.languagePlace,
+      })
+      .subscribe({
+        next: (response) => {
+          console.log('Respuesta de la IA:', response.answer);
+          const msgFiltered = this.messages.filter(
+            (msg) => !(msg.type === 'assistant' && msg.isLoading)
+          );
+          this.messages = [
+            ...msgFiltered,
+            {
+              type: 'assistant',
+              key: this.userId + '_resp_' + Date.now(),
+              message: response.answer,
+              time: new Date().toISOString(),
+              title: this.labelAssistant,
+              isLoading: false,
+            },
+          ];
+          this.isLoading = false;
+          this.cdr.detectChanges();
+        },
+        error: (error) => {
+          console.error('Error al comunicarse con la IA:', error);
+          this.isLoading = false;
+        },
+      });
   }
-
 }
