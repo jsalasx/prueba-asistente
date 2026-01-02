@@ -153,7 +153,7 @@ export class Tab2Page implements OnInit {
         'ASISTANT_TAB_MAIN.IA_QUICK_LINK_6',
         'ASISTANT_TAB_MAIN.LABEL_MSG_ADMINISTRATOR',
         'ASISTANT_TAB_MAIN.LABEL_MSG_ASSISTANT',
-        'WAITING_FOR_RESPONSE',
+        'ASISTANT_TAB_MAIN.WAITING_FOR_RESPONSE',
       ])
       .subscribe((t) => {
         this.preguntasParaIaPorDefecto = [
