@@ -167,7 +167,7 @@ export class Tab2Page implements OnInit {
 
         this.labelAdmin = t['ASISTANT_TAB_MAIN.LABEL_MSG_ADMINISTRATOR'];
         this.labelAssistant = t['ASISTANT_TAB_MAIN.LABEL_MSG_ASSISTANT'];
-        this.labelWaitingResponse = t['WAITING_FOR_RESPONSE'];
+        this.labelWaitingResponse = t['ASISTANT_TAB_MAIN.WAITING_FOR_RESPONSE'];
 
         this.isFetchingTranslatedText = false;
         this.cdr.detectChanges();

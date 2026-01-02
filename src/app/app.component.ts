@@ -13,11 +13,14 @@ import { UserStateService } from './services/state/user-state-service';
   standalone: false,
 })
 export class AppComponent implements OnInit {
+
+  placeId : string = '';
+
   constructor(private translate: TranslateService, private userService: UserService,
     private placeService: PlaceService,
     private userStateService: UserStateService,
     private platform: Platform,
-    private swUpdate: SwUpdate
+    private swUpdate: SwUpdate,
   ) {
     this.initializeApp();
   }
@@ -52,12 +55,17 @@ export class AppComponent implements OnInit {
     try {
       let url = new URLSearchParams(window.location.search);
       console.log("UURL" + url.toString());
-      let userId = 'tFBdEUUaMe'//url.get('user'); //'7HZwsgb3ZW'
-      let placeId = "bWCHeckDTt" //url.get('place'); //'sO6yzWDnHL'
-
+      let userId = url.get('userId'); //'tFBdEUUaMe'
+      if (!userId) {
+        alert("userId requerido.");
+        console.error("No se proporcionó userId en la URL");
+        return;
+      }
       await this.userService.obtenerUsuario(userId);
-      this.placeService.obtenerTienda(placeId).then(async place => {
+      this.placeService.obtenerTiendaByUserId(userId).then(async place => {
         console.log("PLACE", place);
+        const placeId = place?.id || '';
+        this.placeId = placeId;
         const languagePlace = this.parseLanguageCode(place?.get('lenguaje') || 'es');
         console.log("Language Place:", languagePlace);
         this.translate.addLangs(['es', 'en', 'pr']);
@@ -67,7 +75,7 @@ export class AppComponent implements OnInit {
         });
 
         this.userStateService.setUserData({ userId: userId! });
-        this.userStateService.setPlaceData({ placeId: placeId!, lenguaje: languagePlace });
+        this.userStateService.setPlaceData({ placeId: this.placeId!, lenguaje: languagePlace });
       });
 
     } catch (error) {

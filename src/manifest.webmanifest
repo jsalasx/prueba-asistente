@@ -1,12 +1,12 @@
 {
-  "name": "Mi App Ionic",
-  "short_name": "MiApp",
+  "name": "Catalog Store Assistant",
+  "short_name": "CSA",
   "theme_color": "#660066",
   "background_color": "#ffffff",
   "display": "standalone",
   "scope": "./",
   "start_url": "./",
-  "description": "Descripción de mi aplicación",
+  "description": "Asistente para la gestión de inventario y ventas en tiendas",
   "orientation": "portrait",
   "icons": [
     {
