@@ -1,61 +1,85 @@
 <div class="p-4" *ngIf="messages.length > 0">
-  <app-suggestion-card [text]="today" textSize="text-sm">
-  </app-suggestion-card>
+  <app-suggestion-card [text]="today" textSize="text-sm"> </app-suggestion-card>
 </div>
 <div class="p-4 pb-24 space-y-4">
-
   <ng-container *ngFor="let item of messages; trackBy: trackByKey">
-
     <!-- Mensaje del usuario (derecha) -->
-    <div *ngIf="item.type === 'user'" class="flex justify-end">
+    @if (item.type === 'user') {
+    <div class="flex justify-end">
       <div class="max-w-[80%] w-fit lg:max-w-md">
-
-        <div class="bg-gray-200 text-gray-900 rounded-3xl rounded-tr-sm py-2 px-3 shadow-sm">
-          <p *ngIf="item.title" class="text-xs font-medium text-gray-600 mb-1 text-right">
+        <div
+          class="bg-gray-200 text-gray-900 rounded-3xl rounded-tr-sm py-2 px-3 shadow-sm"
+        >
+          <p
+            *ngIf="item.title"
+            class="text-xs font-medium text-gray-600 mb-1 text-right"
+          >
             {{ item.title }}
           </p>
           <p class="text-base leading-relaxed">{{ item.message }}</p>
-          <p class="text-xs text-gray-500 mt-1 text-right">{{ item.time | date:'hh:mm a' }}</p>
+          <p class="text-xs text-gray-500 mt-1 text-right">
+            {{ item.time | date : "hh:mm a" }}
+          </p>
         </div>
-
       </div>
     </div>
-
+    }
     <!-- Mensaje del asistente (izquierda) -->
-    <div *ngIf="item.type === 'assistant' && item.isLoading==true" class="flex justify-start">
-      <div class="max-w-[80%] bg-purple-100 text-purple-900 rounded-2xl rounded-tl-none py-2 px-3 shadow-sm animate-pulse">
-
-        <div class="text-white rounded-3xl rounded-tl-sm ">
-          <p *ngIf="item.title" class="text-xs font-semibold text-gray-600 mb-1 tracking-wider text-left">
+    @if (item.type === 'assistant' && item.isLoading==true) {
+    <div class="flex justify-start">
+      <div
+        class="max-w-[80%] bg-purple-100 text-purple-900 rounded-2xl rounded-tl-none py-2 px-3 shadow-sm animate-pulse"
+      >
+        <div class="text-white rounded-3xl rounded-tl-sm">
+          <p
+            *ngIf="item.title"
+            class="text-xs font-semibold text-gray-600 mb-1 tracking-wider text-left"
+          >
             {{ item.title }}
           </p>
-          <p class="text-sm italic font-medium font-bold text-purple-600" [innerHTML]="item.message | formatMarkdown"></p>
+          <p
+            class="text-sm italic font-medium text-purple-600"
+            [innerHTML]="item.message | formatMarkdown"
+          ></p>
           <div class="flex space-x-1 mt-2 justify-end">
-            <div class="w-1.5 h-1.5 bg-purple-600 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-            <div class="w-1.5 h-1.5 bg-purple-600 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-            <div class="w-1.5 h-1.5 bg-purple-600 rounded-full animate-bounce"></div>
+            <div
+              class="w-1.5 h-1.5 bg-purple-600 rounded-full animate-bounce [animation-delay:-0.3s]"
+            ></div>
+            <div
+              class="w-1.5 h-1.5 bg-purple-600 rounded-full animate-bounce [animation-delay:-0.15s]"
+            ></div>
+            <div
+              class="w-1.5 h-1.5 bg-purple-600 rounded-full animate-bounce"
+            ></div>
           </div>
-          <p class="text-xs text-purple-400 mt-1 text-right">{{ item.time | date:'hh:mm a' }}</p>
+          <p class="text-xs text-purple-400 mt-1 text-right">
+            {{ item.time | date : "hh:mm a" }}
+          </p>
         </div>
-
       </div>
     </div>
-
-    <div *ngIf="item.type === 'assistant' && item.isLoading==false" class="flex justify-start">
+    } @if (item.type === 'assistant' && item.isLoading==false) {
+    <div class="flex justify-start">
       <div class="max-w-[80%] w-fit lg:max-w-md">
-
-        <div class="bg-gray-50 text-white rounded-3xl rounded-tl-sm py-2 px-3 shadow-sm">
-          <p *ngIf="item.title" class="text-xs font-medium text-gray-500 mb-1 text-left">
+        <div
+          class="bg-gray-50 text-white rounded-3xl rounded-tl-sm py-2 px-3 shadow-sm"
+        >
+          <p
+            *ngIf="item.title"
+            class="text-xs font-medium text-gray-500 mb-1 text-left"
+          >
             {{ item.title }}
           </p>
-          <p class="text-base text-gray-900 leading-relaxed" [innerHTML]="item.message | formatMarkdown"></p>
-          <p class="text-xs text-gray-400 mt-1 text-right">{{ item.time | date:'hh:mm a' }}</p>
+          <p
+            class="text-base text-gray-900 leading-relaxed"
+            [innerHTML]="item.message | formatMarkdown"
+          ></p>
+          <p class="text-xs text-gray-400 mt-1 text-right">
+            {{ item.time | date : "hh:mm a" }}
+          </p>
         </div>
-
       </div>
     </div>
-
-
+    }
   </ng-container>
-
 </div>
