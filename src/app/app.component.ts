@@ -55,7 +55,7 @@ export class AppComponent implements OnInit {
     try {
       let url = new URLSearchParams(window.location.search);
       console.log("UURL" + url.toString());
-      let userId = url.get('userId'); //'tFBdEUUaMe'
+      let userId = url.get('userId') || "tFBdEUUaMe" ; //'tFBdEUUaMe'
       if (!userId) {
         alert("userId requerido.");
         console.error("No se proporcionó userId en la URL");
